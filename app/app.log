@@ -1,0 +1,30 @@
+2026-01-30 02:53:12,252 - app.core.logging - INFO - load_pdf:24 - Loading PDF from: /Users/vladislav/Documents/git_repo/Polovoz/app/tests/test_datasets/petrovich_test.pdf
+2026-01-30 02:53:12,392 - app.core.logging - INFO - load_pdf:28 - Loaded 4 document(s) from PDF.
+2026-01-30 02:53:12,459 - app.core.logging - INFO - chunk_documents:38 - Generated 8 hierarchical nodes.
+2026-01-30 02:53:12,911 - app.core.logging - INFO - chunk2vDB:55 - ℹ️ Collection 'test_collection_temp' will be created automatically by llama-index
+2026-01-30 02:53:14,050 - app.core.logging - INFO - chunk2vDB:68 - ✅ Successfully wrote 8 nodes to Qdrant collection 'test_collection_temp'.
+2026-01-30 03:06:02,767 - app.core.logging - INFO - load_pdf:24 - Loading PDF from: /Users/vladislav/Documents/git_repo/Polovoz/app/tests/test_datasets/petrovich_test.pdf
+2026-01-30 03:06:02,926 - app.core.logging - INFO - load_pdf:28 - Loaded 4 document(s) from PDF.
+2026-01-30 03:06:03,013 - app.core.logging - INFO - chunk_documents:38 - Generated 8 hierarchical nodes.
+2026-01-30 03:06:03,669 - app.core.logging - INFO - chunk2vDB:60 - ℹ️ Using existing collection: test
+2026-01-30 03:06:04,981 - app.core.logging - INFO - chunk2vDB:69 - ✅ Successfully wrote 8 nodes to Qdrant collection 'test'.
+2026-01-30 03:08:36,821 - app.core.logging - INFO - load_pdf:24 - Loading PDF from: /Users/vladislav/Documents/git_repo/Polovoz/app/tests/test_datasets/petrovich_test.pdf
+2026-01-30 03:08:36,958 - app.core.logging - INFO - load_pdf:28 - Loaded 4 document(s) from PDF.
+2026-01-30 03:08:37,027 - app.core.logging - INFO - chunk_documents:38 - Generated 8 hierarchical nodes.
+2026-01-30 03:08:37,376 - app.core.logging - INFO - chunk2vDB:55 - ℹ️ Using existing collection: test
+2026-01-30 03:08:39,645 - app.core.logging - INFO - chunk2vDB:71 - ✅ Successfully wrote 8 nodes to Qdrant collection 'test'.
+2026-01-30 03:16:02,099 - app.core.logging - INFO - load_pdf:24 - Loading PDF from: /Users/vladislav/Documents/git_repo/Polovoz/app/tests/test_datasets/petrovich_test.pdf
+2026-01-30 03:16:02,235 - app.core.logging - INFO - load_pdf:28 - Loaded 4 document(s) from PDF.
+2026-01-30 03:16:02,305 - app.core.logging - INFO - chunk_documents:38 - Generated 8 hierarchical nodes.
+2026-01-30 03:16:02,657 - app.core.logging - INFO - chunk2vDB:55 - ℹ️ Using existing collection: test
+2026-01-30 03:16:03,930 - app.core.logging - INFO - chunk2vDB:69 - ✅ Successfully wrote 8 nodes to Qdrant collection 'test'.
+2026-01-30 03:19:38,933 - app.core.logging - INFO - load_pdf:24 - Loading PDF from: /Users/vladislav/Documents/git_repo/Polovoz/app/tests/test_datasets/petrovich_test.pdf
+2026-01-30 03:19:39,073 - app.core.logging - INFO - load_pdf:28 - Loaded 4 document(s) from PDF.
+2026-01-30 03:19:39,180 - app.core.logging - INFO - chunk_documents:38 - Generated 8 hierarchical nodes.
+2026-01-30 03:19:39,549 - app.core.logging - INFO - chunk2vDB:55 - ℹ️ Using existing collection: test
+2026-01-30 03:19:40,883 - app.core.logging - INFO - chunk2vDB:71 - ✅ Successfully wrote 8 nodes to Qdrant collection 'test'.
+2026-01-30 03:25:57,459 - app.core.logging - INFO - load_pdf:24 - Loading PDF from: /Users/vladislav/Documents/git_repo/Polovoz/app/tests/test_datasets/petrovich_test.pdf
+2026-01-30 03:25:57,604 - app.core.logging - INFO - load_pdf:28 - Loaded 4 document(s) from PDF.
+2026-01-30 03:25:57,671 - app.core.logging - INFO - chunk_documents:38 - Generated 8 hierarchical nodes.
+2026-01-30 03:25:58,014 - app.core.logging - INFO - chunk2vDB:54 - ℹ️ Using existing collection: test
+2026-01-30 03:26:00,182 - app.core.logging - INFO - chunk2vDB:71 - ✅ Successfully wrote 8 nodes to Qdrant collection 'test'.
