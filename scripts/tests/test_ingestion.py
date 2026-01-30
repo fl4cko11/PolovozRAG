@@ -2,17 +2,22 @@ from pathlib import Path
 
 import pytest
 
-from app.repositories.ingestion import File2vDB
+from scripts.ingestion_qdrant import IngestionPipeline
 
 
 @pytest.fixture
-def file2vdb():
-    return File2vDB()
+def ingestion_pipeline():
+    return IngestionPipeline()
 
 
 @pytest.fixture
 def pdf_path():
-    path = Path(__file__).parent / "test_datasets" / "petrovich_test.pdf"
+    path = (
+        Path(__file__).parent.parent
+        / "datasets"
+        / "test_datasets"
+        / "petrovich_test.pdf"
+    )
     if not path.exists():
         pytest.skip(f"Test PDF not found: {path}")
     return path
@@ -23,7 +28,7 @@ def collection_name():
     return "test"
 
 
-def test_upload_pdf_to_qdrant(file2vdb, pdf_path, collection_name):
+def test_upload_pdf_to_qdrant(ingestion_pipeline, pdf_path, collection_name):
     """
     Тестируем загрузку PDF в Qdrant без автоматического удаления коллекции.
     """
@@ -31,7 +36,7 @@ def test_upload_pdf_to_qdrant(file2vdb, pdf_path, collection_name):
 
     # Запускаем пайплайн
     try:
-        file2vdb.run(pdf_path, collection_name)
+        ingestion_pipeline.run(pdf_path, collection_name)
         print("✅ Upload to Qdrant completed.")
     except Exception as e:
         pytest.fail(f"❌ Pipeline failed: {e}")
