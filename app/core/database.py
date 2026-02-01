@@ -1,5 +1,5 @@
 import requests
-from llama_index.core import VectorStoreIndex
+from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
@@ -13,7 +13,7 @@ from app.core.logging import logger
 from app.core.ml_models import embed_model
 
 
-def get_qdrant_client():
+def _get_qdrant_client():
     try:
         logger.info("🔄 Начинаем соединение с qdrant")
         client = QdrantClient(
@@ -36,23 +36,50 @@ def get_qdrant_client():
         raise
 
 
-def get_qdrant_math_retriever(client: QdrantClient):
+def _get_qdrant_ingestier_math(client: QdrantClient):
     try:
-        logger.info("🔄 Начинаем создание retriever")
+        logger.info("🔄 Начинаем создание ingestier_math")
+        ingestion_vector_store = QdrantVectorStore(
+            client=client,
+            collection_name="math",
+            distance_metric="Cosine",
+        )
+
+        ingestier_math = StorageContext.from_defaults(
+            vector_store=ingestion_vector_store
+        )
+        logger.info("✅ Создание ingestier_math успешно")
+        return ingestier_math
+    except Exception as e:
+        logger.error(f"❌ Ошибка инициализации ingestier_math: {e}")
+
+
+def _get_qdrant_retriever_math(client: QdrantClient):
+    try:
+        logger.info("🔄 Начинаем создание retriever_math")
         retrieve_vector_store = QdrantVectorStore(client=client, collection_name="math")
 
         index = VectorStoreIndex.from_vector_store(vector_store=retrieve_vector_store)
 
-        retriever = VectorIndexRetriever(
+        retriever_math = VectorIndexRetriever(
             index=index,
             similarity_top_k=settings.QUERY_TOP_K,
             embed_model=embed_model,
         )
-        logger.info("✅ Создание retriever успешно")
-        return retriever
+        logger.info("✅ Создание retriever_math успешно")
+        return retriever_math
     except Exception as e:
-        logger.error(f"❌ Ошибка инициализации retriever: {e}")
+        logger.error(f"❌ Ошибка инициализации retriever_math: {e}")
 
 
-client = get_qdrant_client()
-retriever_math = get_qdrant_math_retriever(client)
+_client = _get_qdrant_client()
+
+_retriever_math = _get_qdrant_retriever_math(_client)
+
+_ingestier_math = _get_qdrant_ingestier_math(_client)
+
+retrievers = [
+    _retriever_math
+]  # порядок должен соответсвовать именам коллекций в конфиге
+
+ingestiers = [_ingestier_math]
