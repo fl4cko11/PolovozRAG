@@ -1,17 +1,15 @@
 import sys
 from pathlib import Path
 
-from llama_index.core import Document, StorageContext, VectorStoreIndex
+from llama_index.core import Document
 from llama_index.core.node_parser import HierarchicalNodeParser
 from llama_index.readers.file import PDFReader
-from llama_index.vector_stores.qdrant import QdrantVectorStore
 
 # Добавляем корень проекта в PYTHONPATH (одноразовый пайплайн)
 root_path = Path(__file__).parent.parent  # предполагается, что скрипт в scripts/
 sys.path.append(str(root_path))
 
-from app.core.database import client
-from app.core.ml_models import embed_model
+from app.repositories.qdrant import ingest_nodes_to_qdrant
 from app.utils.validators import ensure_path_exists
 
 
@@ -49,29 +47,7 @@ class IngestionPipeline:
     def chunk2vDB(self, nodes: list, collection_name: str):
         """Записываем ноды в Qdrant"""
         try:
-
-            print("🔄 Начинаем запись в БД...")
-
-            ingestion_vector_store = QdrantVectorStore(
-                client=client,
-                collection_name=collection_name,
-                distance_metric="Cosine",
-            )
-
-            storage_context = StorageContext.from_defaults(
-                vector_store=ingestion_vector_store
-            )
-
-            VectorStoreIndex(
-                nodes=nodes,
-                storage_context=storage_context,
-                embed_model=embed_model,
-                show_progress=True,
-            )
-            print(
-                f"✅ Успешно wrote {len(nodes)} nodes to Qdrant collection '{collection_name}'."
-            )
-
+            ingest_nodes_to_qdrant(nodes, collection_name)
         except Exception as e:
             print(f"❌ Не удалось загрузить в qdrant: {e}")
             sys.exit(1)
