@@ -39,4 +39,4 @@ def retrieve_nodes_from_qdrant(query: str, collection_name: str):
         logger.info(f"✅ Успешно извлекли {len(nodes)} из '{collection_name}' в qdrant")
         return nodes
     except Exception as e:
-        logger.error(f"❌ Не удалось загрузить в qdrant: {e}")
+        logger.error(f"❌ Не удалось извлечь из qdrant: {e}")
