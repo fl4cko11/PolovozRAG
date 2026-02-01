@@ -51,7 +51,3 @@ def download_reranking():
     except Exception as e:
         print(f"❌ Не удалось загрузить модель реранкинга: {e}")
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    download_reranking()
