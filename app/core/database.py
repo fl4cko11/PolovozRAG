@@ -11,7 +11,7 @@ from app.core.logging import logger
 from app.utils.validators import ensure_directory_exists
 
 
-def get_qdrant_ingestion_client():
+def get_qdrant_client():
     try:
         client = QdrantClient(
             url=settings.QDRANT_URL,
