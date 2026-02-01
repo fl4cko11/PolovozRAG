@@ -10,7 +10,8 @@ from llama_index.vector_stores.qdrant import QdrantVectorStore
 root_path = Path(__file__).parent.parent  # предполагается, что скрипт в scripts/
 sys.path.append(str(root_path))
 
-from app.core.database import get_embed_model, get_qdrant_client
+from app.core.database import get_qdrant_client
+from app.core.models import get_embed_model
 from app.utils.validators import ensure_path_exists
 
 
