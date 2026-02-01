@@ -52,13 +52,15 @@ class IngestionPipeline:
 
             print("🔄 Начинаем запись в БД...")
 
-            vector_store = QdrantVectorStore(
+            ingestion_vector_store = QdrantVectorStore(
                 client=client,
                 collection_name=collection_name,
                 distance_metric="Cosine",
             )
 
-            storage_context = StorageContext.from_defaults(vector_store=vector_store)
+            storage_context = StorageContext.from_defaults(
+                vector_store=ingestion_vector_store
+            )
 
             VectorStoreIndex(
                 nodes=nodes,
