@@ -10,7 +10,7 @@ from llama_index.vector_stores.qdrant import QdrantVectorStore
 root_path = Path(__file__).parent.parent  # предполагается, что скрипт в scripts/
 sys.path.append(str(root_path))
 
-from app.core.database import get_embed_model, get_qdrant_client
+from app.core.database import get_embed_model, get_qdrant_ingestion_client
 from app.utils.validators import ensure_path_exists
 
 
@@ -54,7 +54,7 @@ class IngestionPipeline:
             embed_model = get_embed_model()
             print("✅ Модель эмбеддингов успешно загружена и инициализирована.")
 
-            client = get_qdrant_client()
+            client = get_qdrant_ingestion_client()
             print("✅ Подключение к Qdrant успешно установлено.")
 
             vector_store = QdrantVectorStore(
@@ -91,7 +91,7 @@ class IngestionPipeline:
 
 
 if __name__ == "__main__":
-    pdf_path = Path(__file__).parent / "datasets" / "main_datasets" / "petrovich_2.pdf"
+    pdf_path = Path(__file__).parent / "datasets" / "main_datasets" / "polovoz.pdf"
     loc_dir = ensure_path_exists(pdf_path)
 
     collection_name = "math"
