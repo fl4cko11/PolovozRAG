@@ -59,7 +59,9 @@ def _get_qdrant_retriever_math(client: QdrantClient):
         logger.info("🔄 Начинаем создание retriever_math")
         retrieve_vector_store = QdrantVectorStore(client=client, collection_name="math")
 
-        index = VectorStoreIndex.from_vector_store(vector_store=retrieve_vector_store)
+        index = VectorStoreIndex.from_vector_store(
+            vector_store=retrieve_vector_store, embed_model=embed_model
+        )
 
         retriever_math = VectorIndexRetriever(
             index=index,

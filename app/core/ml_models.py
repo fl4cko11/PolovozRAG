@@ -34,7 +34,7 @@ def get_reranking_model():
         local_dir = ensure_directory_exists(settings.RERANKING_MODEL_DIR)
 
         model = SentenceTransformerRerank(
-            model_name=str(local_dir), top_n=settings.RERANK_TOP_K, device="mps"
+            model=str(local_dir), top_n=settings.RERANK_TOP_K, device="mps"
         )
         logger.info("✅ Модель реранкинга успешно загружена и инициализирована")
         return model
@@ -45,7 +45,7 @@ def get_reranking_model():
         logger.error(f"❌ Путь не является директорией: {e}")
         raise
     except Exception as e:
-        logger.error(f"❌ Не удалось инициализировать модель эмбеддингов: {e}")
+        logger.error(f"❌ Не удалось инициализировать модель реранкинга: {e}")
         raise
 
 
