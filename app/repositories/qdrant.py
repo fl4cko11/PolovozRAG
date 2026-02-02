@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 
 from llama_index.core import Document, VectorStoreIndex
@@ -27,7 +26,7 @@ class IngestionPipeline:
 
         except Exception as e:
             logger.error(f"❌ Не удалось загрузить модель: {e}")
-            sys.exit(1)
+            raise
 
     def chunk_documents(self, documents: list[Document]) -> list:
         """Разбиваем документы на иерархические чанки (ноды)."""
@@ -41,7 +40,7 @@ class IngestionPipeline:
 
         except Exception as e:
             logger.error(f"❌ Ошибка при разбиении на чанки: {e}")
-            sys.exit(1)
+            raise
 
     def ingest_nodes_to_qdrant(self, nodes: list, collection_name: str):
         try:
@@ -62,6 +61,7 @@ class IngestionPipeline:
             )
         except Exception as e:
             logger.error(f"❌ Не удалось загрузить в qdrant: {e}")
+            raise
 
     def run(self, file_path: Path | str, collection_name: str):
         """
@@ -69,9 +69,13 @@ class IngestionPipeline:
         :param file_path: Путь к PDF-файлу
         :param collection_name: Имя коллекции в Qdrant
         """
-        documents = self.load_pdf(file_path)
-        nodes = self.chunk_documents(documents)
-        self.ingest_nodes_to_qdrant(nodes, collection_name)
+        try:
+            documents = self.load_pdf(file_path)
+            nodes = self.chunk_documents(documents)
+            self.ingest_nodes_to_qdrant(nodes, collection_name)
+        except Exception as e:
+            logger.error(f"❌ Ошибка при выполнении ингестии: {e}")
+            raise
 
 
 def retrieve_nodes_from_qdrant(query: str, collection_name: str):
@@ -90,3 +94,4 @@ def retrieve_nodes_from_qdrant(query: str, collection_name: str):
         return nodes
     except Exception as e:
         logger.error(f"❌ Не удалось извлечь из qdrant: {e}")
+        raise
