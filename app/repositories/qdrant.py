@@ -82,8 +82,9 @@ def retrieve_nodes_from_qdrant(query: str, collection_name: str):
                 break
 
         logger.info(
-            f"🔄 Делаем запрос на извлечение из '{collection_name}' в qdrant..."
+            f'🔄 Делаем retrieve запрос: "{query}" к "{collection_name}" в qdrant'
         )
+
         nodes = retriever.retrieve(query)
         logger.info(f"✅ Успешно извлекли {len(nodes)} из '{collection_name}' в qdrant")
         return nodes
