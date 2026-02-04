@@ -7,7 +7,8 @@ from llama_index.readers.file import PDFReader
 from app.core.config import settings
 from app.core.database import ingestiers, retrievers
 from app.core.logging import logger
-from app.core.ml_models import embed_model
+from app.core.ml_models import embed_model, reranker_model
+from app.schemas.agent_state import AgentState, SerializableNode
 from app.utils.validators import ensure_path_exists
 
 
@@ -95,3 +96,24 @@ def retrieve_nodes_from_qdrant(query: str, collection_name: str):
     except Exception as e:
         logger.error(f"❌ Не удалось извлечь из qdrant: {e}")
         raise
+
+
+def retrieve_node(state: AgentState):
+    nodes = retrieve_nodes_from_qdrant(state.user_query, state.textbook_theme)
+    reranked_nodes = reranker_model.postprocess_nodes(
+        nodes=nodes,
+        query_str=state.user_query,
+    )
+
+    # Преобразуем NodeWithScore → SerializableNode
+    serializable_nodes = [
+        SerializableNode(
+            id=n.node_id,
+            text=n.get_content(),
+            score=getattr(n, "score", None),
+            metadata=n.metadata or {},
+        )
+        for n in reranked_nodes
+    ]
+
+    return {"reranked_nodes": serializable_nodes}
