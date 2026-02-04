@@ -18,9 +18,9 @@
 
 ## 👀 Структура проекта
 
+```text
 .
 ├── app
-│   ├── __init__.py
 │   ├── api                 # FastAPI сервер
 │   ├── app.log
 │   ├── core
@@ -46,8 +46,7 @@
 │   │   ├── test_connections.py
 │   │   ├── test_llm.py
 │   │   ├── test_reranker.py
-│   │   ├── test_retriever.py
-│   │   └── test_parsing.py
+│   │   └── test_retriever.py
 │   └── utils
 │       └── validators.py
 ├── polovoz.txt
@@ -65,3 +64,4 @@
     └── tests
         ├── test_ingestion.py
         └── test_parsing.py
+```
