@@ -21,32 +21,33 @@
 .
 ├── app
 │   ├── __init__.py
-│   ├── api # FastAPI сервер
+│   ├── api                 # FastAPI сервер
 │   ├── app.log
 │   ├── core
 │   │   ├── config.py
-│   │   ├── database.py # подключение и настройка БД
+│   │   ├── database.py     # подключение и настройка БД
 │   │   ├── logging.py
-│   │   ├── ml_models # локально загруженные модели с HF
+│   │   ├── ml_models       # локально загруженные модели с HF
 │   │   │   ├── embeddings
 │   │   │   └── reranking
-│   │   ├── ml_models.py # подключение локальных моделей к LlamaIndex
+│   │   ├── ml_models.py    # подключение локальных моделей к LlamaIndex
 │   │   └── polovoz.env
 │   ├── external
-│   │   └── llm.py # GigaChat API
+│   │   └── llm.py          # GigaChat API
 │   ├── repositories
-│   │   └── qdrant.py # ингестия и запросы к qdrant
+│   │   └── qdrant.py       # ингестия и запросы к Qdrant
 │   ├── schemas
-│   │   ├── agent_state.py # схема состояния агента для LangGraph
+│   │   ├── agent_state.py  # схема состояния агента для LangGraph
 │   │   └── query.py
 │   ├── services
-│   │   └── self_rag.py # stateful граф SelfRAG агента на LangGraph
+│   │   └── self_rag.py     # stateful граф SelfRAG агента на LangGraph
 │   ├── tests
 │   │   ├── test_agent.py
 │   │   ├── test_connections.py
 │   │   ├── test_llm.py
 │   │   ├── test_reranker.py
-│   │   └── test_retriever.py
+│   │   ├── test_retriever.py
+│   │   └── test_parsing.py
 │   └── utils
 │       └── validators.py
 ├── polovoz.txt
@@ -58,9 +59,9 @@
     │   │   └── polovoz.pdf
     │   └── test_datasets
     │       └── polovoz_test.pdf
-    ├── download_models.py # загрузка моделей с HF
+    ├── download_models.py            # загрузка моделей с HF
     ├── get_gigachat_access_token.py
-    ├── ingestion_qdrant.py # ингестия в qdrant
+    ├── ingestion_qdrant.py           # ингестия в Qdrant
     └── tests
         ├── test_ingestion.py
         └── test_parsing.py
