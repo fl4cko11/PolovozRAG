@@ -5,7 +5,7 @@ from app.schemas.agent_state import AgentState
 
 
 def generate_node(state: AgentState):
-    generate_prompt = f"""Ты — эксперт в области {state.textbook_theme}". Твоя задача — дать точный, краткий и цитируемый ответ на вопрос пользователя, относящийся к выделенному тексту, ОБЯЗАТЕЛЬНО используя информацию из предоставленных фрагментов (каждый с id). Если информация недостаточна — скажи "Не могу ответить на основе учебника".
+    generate_prompt = f"""Ты — эксперт в области {state.textbook_theme}". Твоя задача — дать точный, краткий и цитируемый ответ на вопрос пользователя, относящийся к выделенному тексту, ОБЯЗАТЕЛЬНО используя информацию из предоставленных фрагментов (каждый с id) и в конце ответа обязательно в ответе сделай ссылку на фрагмент в формате [id]. Если информация недостаточна — скажи "Не могу ответить на основе учебника".
 
 Вопрос пользователя: "{state.user_query}"
 Выделенный текст: {state.highlighted_text}
@@ -15,13 +15,12 @@ def generate_node(state: AgentState):
 
 ИНСТРУКЦИЯ:
 1. Ответ должен быть на русском.
-2. Укажи id источника в формате [id] после каждой цитаты.
-3. Не выдумывай факты. Если нет подтверждения — напиши В ТОЧНОСТИ ЭТУ ФРАЗУ: «Не могу ответить на основе учебника».
+2. Не выдумывай факты. Если нет подтверждения — напиши В ТОЧНОСТИ ЭТУ ФРАЗУ: «Не могу ответить на основе учебника».
 """
     with GigaChat(credentials=settings.GIGACHAT_API_AUTH_KEY) as client:
         response = client.chat(generate_prompt)
 
-    return {"answer": response}
+    return {"answer": response.choices[0].message.content}
 
 
 def rewrite_query_node(state: AgentState):
@@ -40,6 +39,7 @@ def rewrite_query_node(state: AgentState):
     with GigaChat(credentials=settings.GIGACHAT_API_AUTH_KEY) as client:
         response = client.chat(rewrite_query_prompt)
 
-    cur_iter = state.iteration
-
-    return {"user_query": response, "iteration": cur_iter + 1}
+    return {
+        "user_query": response.choices[0].message.content,
+        "iteration": state.iteration + 1,
+    }

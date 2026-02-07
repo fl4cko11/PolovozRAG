@@ -31,9 +31,28 @@ def route_after_generate(state: AgentState):
         if "Не могу ответить" in state.answer:
             return "rewrite_query"
         else:
-            return "final_answer"
+            return "postprocess"
     else:
-        return "final_answer"
+        return "postprocess"
+
+
+def postprocess_node(state: AgentState) -> dict:
+    """
+    Заменяет все вхождения [id] в ответе на текст из reranked_nodes.
+    Пример: [0] → "(источник: 'текст фрагмента под номером 0...')"
+    """
+    answer = state.answer or ""
+    for node in state.reranked_nodes:
+        placeholder = f"[{node.id}]"
+        if placeholder in answer:
+            citation_text = f'(источник: "{node.text.strip()}"'
+            if len(citation_text) > 100:
+                citation_text = citation_text[:97] + "…)"
+            else:
+                citation_text += ")"
+            answer = answer.replace(placeholder, citation_text)
+
+    return {"answer": answer}
 
 
 builder = StateGraph(AgentState)
@@ -41,6 +60,7 @@ builder.add_node("retrieve", RunnableLambda(retrieve_node))
 builder.add_node("grade", RunnableLambda(grade_node))
 builder.add_node("generate", RunnableLambda(generate_node))
 builder.add_node("rewrite_query", RunnableLambda(rewrite_query_node))
+builder.add_node("postprocess", RunnableLambda(postprocess_node))
 
 builder.add_edge(START, "retrieve")
 builder.add_edge("retrieve", "grade")
@@ -52,8 +72,9 @@ builder.add_conditional_edges(
 builder.add_conditional_edges(
     "generate",
     route_after_generate,
-    {"rewrite_query": "rewrite_query", "final_answer": END},
+    {"rewrite_query": "rewrite_query", "postprocess": "postprocess"},
 )
 builder.add_edge("rewrite_query", "retrieve")
+builder.add_edge("postprocess", END)
 
 graph = builder.compile()
