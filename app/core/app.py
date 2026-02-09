@@ -26,7 +26,9 @@ async def lifespan(app: FastAPI):
     rerank_model = get_reranking_model(settings, logger)
     qdrant_client = get_qdrant_client(settings, logger)
     qdrant = Qdrant(settings, logger, qdrant_client, embed_model)
-    qdrant_retriever = QdrantRetrieve(settings, logger, qdrant, rerank_model)
+    qdrant_retriever = QdrantRetrieve(
+        settings, logger, qdrant.get_qdrant_retrievers(), rerank_model
+    )
 
     gigachat_nodes = GigaChatNodes(gigachat_client)
     qdrant_nodes = QdrantNodes(qdrant_retriever)
