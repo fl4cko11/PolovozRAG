@@ -12,19 +12,24 @@ from app.core.ml_models import get_embed_model
 from app.repositories.qdrant import QdrantIngestion
 
 if __name__ == "__main__":
-    pdf_path = Path(__file__).parent / "datasets" / "main_datasets" / "polovoz.pdf"
-    collection_name = "math"
+    try:
 
-    settings = Settings()
-    logger = get_logger()
+        pdf_path = Path(__file__).parent / "datasets" / "main_datasets" / "polovoz.pdf"
+        collection_name = "math"
 
-    embed_model = get_embed_model(settings, logger)
-    qdrant_client = get_qdrant_client(settings, logger)
-    qdrant = Qdrant(settings, logger, qdrant_client, embed_model)
+        settings = Settings()
+        logger = get_logger()
 
-    print(f"🔄 Loading PDF: {pdf_path.name}")
+        embed_model = get_embed_model(settings, logger)
+        qdrant_client = get_qdrant_client(settings, logger)
+        qdrant = Qdrant(settings, logger, qdrant_client, embed_model)
 
-    loader = QdrantIngestion(settings, logger, qdrant, embed_model)
-    loader.ingest_nodes_to_qdrant(pdf_path, collection_name)
+        print(f"🔄 Loading PDF: {pdf_path.name}")
 
-    print(f"✅ Успешно ingested into Qdrant collection '{collection_name}'")
+        ingestier = QdrantIngestion(settings, logger, qdrant, embed_model)
+        ingestier.ingest_file_to_qdrant(pdf_path, collection_name)
+
+        print(f"✅ Успешно ingested into Qdrant collection '{collection_name}'")
+
+    except Exception as e:
+        print(f"❌ Не удалось загрузить в qdrant: {type(e).__name__}: {e}")

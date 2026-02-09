@@ -25,7 +25,7 @@ class QdrantIngestion:
         self.qdrant = qdrant
         self.embed_model = emded_model
 
-    def load_pdf(self, file_path: Path | str):
+    def load_file(self, file_path: Path | str):
         """Загружаем PDF по пути к файлу"""
         try:
 
@@ -41,13 +41,13 @@ class QdrantIngestion:
             self.logger.error(f"❌ Не удалось загрузить модель: {e}")
             raise
 
-    def chunk_documents(self, file_path: Path | str):
+    def chunk_file(self, file_path: Path | str):
         """Разбиваем документы на иерархические чанки (ноды)."""
         try:
 
             self.logger.info("🔄 Начинаем чанковать")
             node_parser = HierarchicalNodeParser.from_defaults(chunk_sizes=[1024, 512])
-            documents = self.load_pdf(file_path)
+            documents = self.load_file(file_path)
             nodes = node_parser.get_nodes_from_documents(documents)
             self.logger.info(f"✅ Сгенерировано {len(nodes)} иерархических нод.")
 
@@ -57,9 +57,9 @@ class QdrantIngestion:
             self.logger.error(f"❌ Ошибка при разбиении на чанки: {e}")
             raise
 
-    def ingest_nodes_to_qdrant(self, file_path: Path | str, collection_name: str):
+    def ingest_file_to_qdrant(self, file_path: Path | str, collection_name: str):
         try:
-            nodes = self.chunk_documents(file_path)
+            nodes = self.chunk_file(file_path)
 
             ingestier = self.qdrant.get_qdrant_ingestier(collection_name)
 
@@ -123,7 +123,7 @@ class QdrantRetrieve:
             )
 
             self.logger.info(
-                f"✅ Успешно извлекли {len(reranked_nodes)} из '{collection_name}' в qdrant с реранком"
+                f"✅ Успешно реранкнули {len(reranked_nodes)} из '{collection_name}' в qdrant"
             )
 
             return reranked_nodes
