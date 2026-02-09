@@ -21,46 +21,50 @@
 ```text
 .
 ├── app
-│   ├── api                 # FastAPI сервер
-│   ├── app.log
-│   ├── core
-│   │   ├── config.py
-│   │   ├── database.py     # подключение и настройка БД
-│   │   ├── logging.py
-│   │   ├── ml_models       # локально загруженные модели с HF
-│   │   │   ├── embeddings
-│   │   │   └── reranking
-│   │   ├── ml_models.py    # подключение локальных моделей к LlamaIndex
-│   │   └── polovoz.env
-│   ├── external
-│   │   └── llm.py          # GigaChat API
-│   ├── repositories
-│   │   └── qdrant.py       # ингестия и запросы к Qdrant
-│   ├── schemas
-│   │   ├── agent_state.py  # схема состояния агента для LangGraph
-│   │   └── query.py
-│   ├── services
-│   │   └── self_rag.py     # stateful граф SelfRAG агента на LangGraph
-│   ├── tests
-│   │   ├── test_agent.py
-│   │   ├── test_connections.py
-│   │   ├── test_llm.py
-│   │   ├── test_reranker.py
-│   │   └── test_retriever.py
-│   └── utils
-│       └── validators.py
+│   ├── __init__.py
+│   ├── api                   # FastAPI сервер
+│   │   └── routers.py
+│   ├── app.log
+│   ├── core
+│   │   ├── app.py            # lifespan приложения
+│   │   ├── config.py         # конфигурация проекта
+│   │   ├── database.py       # подключение и настройка БД
+│   │   ├── llm.py            # подключение и настройка LLM
+│   │   ├── logging.py
+│   │   ├── ml_models
+│   │   │   ├── embeddings
+│   │   │   └── reranking
+│   │   └── ml_models.py      # подключение локальных моделей к LlamaIndex
+│   ├── main.py
+│   ├── repositories
+│   │   └── qdrant.py         # работа с qdrant
+│   ├── schemas
+│   │   ├── agent_state.py    # схема состояния агента для LangGraph
+│   │   └── query.py          # схема тела запросов к API
+│   ├── services
+│   │   ├── llm_nodes.py
+│   │   ├── processing_nodes.py
+│   │   ├── qdrant_nodes.py
+│   │   ├── route_nodes.py
+│   │   └── self_rag.py       # stateful граф SelfRAG агента на LangGraph
+│   ├── tests
+│   │   ├── test_agent.py
+│   │   ├── test_connections.py
+│   │   ├── test_llm.py
+│   │   └── test_retrieve.py
+│   └── utils
+│       └── validators.py
 ├── polovoz.txt
 ├── README.md
 ├── requirements.txt
 └── scripts
     ├── datasets
-    │   ├── main_datasets
-    │   │   └── polovoz.pdf
-    │   └── test_datasets
-    │       └── polovoz_test.pdf
-    ├── download_models.py            # загрузка моделей с HF
-    ├── get_gigachat_access_token.py
-    ├── ingestion_qdrant.py           # ингестия в Qdrant
+    │   ├── main_datasets
+    │   │   └── polovoz.pdf
+    │   └── test_datasets
+    │       └── polovoz_test.pdf
+    ├── download_models.py
+    ├── ingestion_qdrant.py
     └── tests
         ├── test_ingestion.py
         └── test_parsing.py
