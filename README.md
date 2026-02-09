@@ -2,7 +2,7 @@
 
 Интерактивная система для изучения учебников с поддержкой RAG и анализом выделенных фрагментов текста.
 
-![Стек](https://img.shields.io/badge/Stack-FastAPI%20%7C%20Qdrant%20%7C%20LlamaIndex%20%7C%20LangGraph%20%7C%20GigaChatAPI%20%7C%20FastAPI-blue)
+![Стек](https://img.shields.io/badge/Stack-FastAPI%20%7C%20Qdrant%20%7C%20LlamaIndex%20%7C%20LangGraph%20%7C%20GigaChatAPI%20%7C%20LangSmith-blue)
 ![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-green)
 
 ## 🌟 Функционал
