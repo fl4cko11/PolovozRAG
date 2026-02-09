@@ -1,7 +1,15 @@
-from gigachat import GigaChat
+from app.core.config import Settings
+from app.core.llm import get_gigachat_client
+from app.core.logging import get_logger
 
-from app.core.config import settings
 
-with GigaChat(credentials=settings.GIGACHAT_API_AUTH_KEY) as client:
-    response = client.chat("Hello, GigaChat!")
+def test_llm_response():
+    settings = Settings()
+    logger = get_logger(settings)
+
+    gigachat_client = get_gigachat_client(settings, logger)
+
+    response = gigachat_client.chat("Hello, GigaChat!")
     print(response.choices[0].message.content)
+
+    return

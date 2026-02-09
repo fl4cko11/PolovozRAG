@@ -1,119 +1,139 @@
+from logging import Logger
 from pathlib import Path
 
-from llama_index.core import Document, VectorStoreIndex
+from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.core.node_parser import HierarchicalNodeParser
+from llama_index.core.postprocessor import SentenceTransformerRerank
+from llama_index.core.retrievers import VectorIndexRetriever
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.readers.file import PDFReader
 
-from app.core.config import settings
-from app.core.database import ingestiers, retrievers
-from app.core.logging import logger
-from app.core.ml_models import embed_model, reranker_model
-from app.schemas.agent_state import AgentState, SerializableNode
+from app.core.config import Settings
 from app.utils.validators import ensure_path_exists
 
 
-class IngestionPipeline:
+class QdrantIngestion:
+    def __init__(
+        self,
+        settings: Settings,
+        logger: Logger,
+        ingestiers: list[StorageContext],
+        emded_model: HuggingFaceEmbedding,
+    ):
+        self.settings = settings
+        self.logger = logger
+        self.ingestiers = ingestiers
+        self.embed_model = emded_model
 
-    def load_pdf(self, file_path: Path | str) -> list[Document]:
+    def load_pdf(self, file_path: Path | str):
         """Загружаем PDF по пути к файлу"""
         try:
 
             loc_dir = ensure_path_exists(file_path)
-            logger.info(f"🔄 Загружаем PDF from: {loc_dir}")
+            self.logger.info(f"🔄 Загружаем PDF from: {loc_dir}")
             reader = PDFReader()
             documents = reader.load_data(file=loc_dir)
-            logger.info(f"✅ Загрузили {len(documents)} document(s) from PDF.")
+            self.logger.info(f"✅ Загрузили {len(documents)} document(s) from PDF.")
+
             return documents
 
         except Exception as e:
-            logger.error(f"❌ Не удалось загрузить модель: {e}")
+            self.logger.error(f"❌ Не удалось загрузить модель: {e}")
             raise
 
-    def chunk_documents(self, documents: list[Document]) -> list:
+    def chunk_documents(self, file_path: Path | str):
         """Разбиваем документы на иерархические чанки (ноды)."""
         try:
 
-            logger.info("🔄 Начинаем чанковать")
+            self.logger.info("🔄 Начинаем чанковать")
             node_parser = HierarchicalNodeParser.from_defaults(chunk_sizes=[1024, 512])
+            documents = self.load_pdf(file_path)
             nodes = node_parser.get_nodes_from_documents(documents)
-            logger.info(f"✅ Сгенерировано {len(nodes)} иерархических нод.")
+            self.logger.info(f"✅ Сгенерировано {len(nodes)} иерархических нод.")
+
             return nodes
 
         except Exception as e:
-            logger.error(f"❌ Ошибка при разбиении на чанки: {e}")
+            self.logger.error(f"❌ Ошибка при разбиении на чанки: {e}")
             raise
 
-    def ingest_nodes_to_qdrant(self, nodes: list, collection_name: str):
+    def ingest_nodes_to_qdrant(self, file_path: Path | str, collection_name: str):
         try:
-            for i in range(len(settings.COLLECTIONS)):
-                if collection_name == settings.COLLECTIONS[i]:
-                    ingestier = ingestiers[i]
+            for i in range(len(self.settings.COLLECTIONS)):
+                if collection_name == self.settings.COLLECTIONS[i]:
+                    ingestier = self.ingestiers[i]
                     break
 
-            logger.info(f"🔄 Начинаем запись в '{collection_name}' в qdrant...")
+            nodes = self.chunk_documents(file_path)
+
+            self.logger.info(f"🔄 Начинаем запись в '{collection_name}' в qdrant...")
             VectorStoreIndex(
                 nodes=nodes,
                 storage_context=ingestier,
-                embed_model=embed_model,
+                embed_model=self.embed_model,
                 show_progress=True,
             )
-            logger.info(
+
+            self.logger.info(
                 f"✅ Успешно записали {len(nodes)} в '{collection_name}' в qdrant"
             )
+
         except Exception as e:
-            logger.error(f"❌ Не удалось загрузить в qdrant: {e}")
+            self.logger.error(f"❌ Не удалось загрузить в qdrant: {e}")
             raise
 
-    def run(self, file_path: Path | str, collection_name: str):
-        """
-        Полный пайплайн: загрузка PDF → чанкинг → индексация в Qdrant
-        :param file_path: Путь к PDF-файлу
-        :param collection_name: Имя коллекции в Qdrant
-        """
+
+class QdrantRetrieve:
+    def __init__(
+        self,
+        settings: Settings,
+        logger: Logger,
+        retrievers: list[VectorIndexRetriever],
+        rerank_model: SentenceTransformerRerank,
+    ):
+        self.settings = settings
+        self.logger = logger
+        self.retrievers = retrievers
+        self.rerank_model = rerank_model
+
+    def retrieve_nodes(self, query: str, collection_name: str):
         try:
-            documents = self.load_pdf(file_path)
-            nodes = self.chunk_documents(documents)
-            self.ingest_nodes_to_qdrant(nodes, collection_name)
+
+            for i in range(len(self.settings.COLLECTIONS)):
+                if collection_name == self.settings.COLLECTIONS[i]:
+                    retriever = self.retrievers[i]
+                    break
+
+            self.logger.info(
+                f'🔄 Делаем retrieve запрос: "{query}" к "{collection_name}" в qdrant'
+            )
+            nodes = retriever.retrieve(query)
+            self.logger.info(
+                f"✅ Успешно извлекли {len(nodes)} из '{collection_name}' в qdrant"
+            )
+
+            return nodes
+
         except Exception as e:
-            logger.error(f"❌ Ошибка при выполнении ингестии: {e}")
+            self.logger.error(f"❌ Не удалось извлечь из qdrant: {e}")
             raise
 
+    def retrieve_nodes_with_rerank(self, query: str, collection_name: str):
+        try:
 
-def retrieve_nodes_from_qdrant(query: str, collection_name: str):
-    try:
-        for i in range(len(settings.COLLECTIONS)):
-            if collection_name == settings.COLLECTIONS[i]:
-                retriever = retrievers[i]
-                break
+            nodes = self.retrieve_nodes(query, collection_name)
 
-        logger.info(
-            f'🔄 Делаем retrieve запрос: "{query}" к "{collection_name}" в qdrant'
-        )
+            reranked_nodes = self.rerank_model.postprocess_nodes(
+                nodes=nodes,
+                query_str=query,
+            )
 
-        nodes = retriever.retrieve(query)
-        logger.info(f"✅ Успешно извлекли {len(nodes)} из '{collection_name}' в qdrant")
-        return nodes
-    except Exception as e:
-        logger.error(f"❌ Не удалось извлечь из qdrant: {e}")
-        raise
+            self.logger.info(
+                f"✅ Успешно извлекли {len(reranked_nodes)} из '{collection_name}' в qdrant с реранком"
+            )
 
+            return reranked_nodes
 
-def retrieve_node(state: AgentState):
-    nodes = retrieve_nodes_from_qdrant(state.user_query, state.textbook_theme)
-    reranked_nodes = reranker_model.postprocess_nodes(
-        nodes=nodes,
-        query_str=state.user_query,
-    )
-
-    # Преобразуем NodeWithScore → SerializableNode
-    serializable_nodes = [
-        SerializableNode(
-            id=n.node_id,
-            text=n.get_content(),
-            score=getattr(n, "score", None),
-            metadata=n.metadata or {},
-        )
-        for n in reranked_nodes
-    ]
-
-    return {"reranked_nodes": serializable_nodes}
+        except Exception as e:
+            self.logger.error(f"❌ Не удалось извлечь из qdrant с реранком: {e}")
+            raise
