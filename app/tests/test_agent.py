@@ -21,8 +21,7 @@ def test_self_rag():
     rerank_model = get_reranking_model(settings, logger)
     qdrant_client = get_qdrant_client(settings, logger)
     qdrant = Qdrant(settings, logger, qdrant_client, embed_model)
-    retrievers = qdrant.get_qdrant_retrievers()
-    qdrant_retriever = QdrantRetrieve(settings, logger, retrievers, rerank_model)
+    qdrant_retriever = QdrantRetrieve(settings, logger, qdrant, rerank_model)
 
     gigachat_nodes = GigaChatNodes(gigachat_client)
     qdrant_nodes = QdrantNodes(qdrant_retriever)

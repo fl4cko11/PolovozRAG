@@ -98,10 +98,24 @@ class Qdrant:
             self.logger.error(f"❌ Ошибка инициализации retriever_math: {e}")
             raise
 
-    def get_qdrant_ingestiers(self):
+    def _get_qdrant_ingestiers(self):
         ingestier_math = self._get_qdrant_ingestier_math()
         return [ingestier_math]  # дописываем соотв-о коллекциям в qdrant
 
-    def get_qdrant_retrievers(self):
+    def _get_qdrant_retrievers(self):
         retriever_math = self._get_qdrant_retriever_math()
         return [retriever_math]
+
+    def get_qdrant_ingestier(self, collection_name: str):
+        ingestiers = self._get_qdrant_ingestiers()
+
+        for i in range(len(self.settings.COLLECTIONS)):
+            if collection_name == self.settings.COLLECTIONS[i]:
+                return ingestiers[i]
+
+    def get_qdrant_retriever(self, collection_name: str):
+        retrievers = self._get_qdrant_retrievers()
+
+        for i in range(len(self.settings.COLLECTIONS)):
+            if collection_name == self.settings.COLLECTIONS[i]:
+                return retrievers[i]

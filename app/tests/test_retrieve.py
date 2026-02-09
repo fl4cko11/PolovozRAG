@@ -15,9 +15,8 @@ def test_retrieve():
         rerank_model = get_reranking_model(settings, logger)
         qdrant_client = get_qdrant_client(settings, logger)
         qdrant = Qdrant(settings, logger, qdrant_client, embed_model)
-        retrievers = qdrant.get_qdrant_retrievers()
 
-        qdrant_retriever = QdrantRetrieve(settings, logger, retrievers, rerank_model)
+        qdrant_retriever = QdrantRetrieve(settings, logger, qdrant, rerank_model)
 
         query = "комплексное число"
         collection_name = "math"

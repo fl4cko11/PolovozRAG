@@ -5,13 +5,26 @@ from pathlib import Path
 root_path = Path(__file__).parent.parent  # предполагается, что скрипт в scripts/
 sys.path.append(str(root_path))
 
-from app.repositories.qdrant import IngestionPipeline
+from app.core.config import Settings
+from app.core.database import Qdrant, get_qdrant_client
+from app.core.logging import get_logger
+from app.core.ml_models import get_embed_model
+from app.repositories.qdrant import QdrantIngestion
 
 if __name__ == "__main__":
     pdf_path = Path(__file__).parent / "datasets" / "main_datasets" / "polovoz.pdf"
     collection_name = "math"
 
+    settings = Settings()
+    logger = get_logger()
+
+    embed_model = get_embed_model(settings, logger)
+    qdrant_client = get_qdrant_client(settings, logger)
+    qdrant = Qdrant(settings, logger, qdrant_client, embed_model)
+
     print(f"🔄 Loading PDF: {pdf_path.name}")
-    loader = IngestionPipeline()
-    loader.run(pdf_path, collection_name)
+
+    loader = QdrantIngestion(settings, logger, qdrant, embed_model)
+    loader.ingest_nodes_to_qdrant(pdf_path, collection_name)
+
     print(f"✅ Успешно ingested into Qdrant collection '{collection_name}'")

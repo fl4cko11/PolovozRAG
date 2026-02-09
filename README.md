@@ -22,31 +22,32 @@
 .
 ├── app
 │   ├── __init__.py
-│   ├── api                   # FastAPI сервер
+│   ├── api                 # FastAPI сервер
+│   │   ├── deps.py
 │   │   └── routers.py
 │   ├── app.log
 │   ├── core
-│   │   ├── app.py            # lifespan приложения
-│   │   ├── config.py         # конфигурация проекта
-│   │   ├── database.py       # подключение и настройка БД
-│   │   ├── llm.py            # подключение и настройка LLM
+│   │   ├── app.py          # lifespan приложения
+│   │   ├── config.py       # конфигурация проекта
+│   │   ├── database.py     # подключение к БД
+│   │   ├── llm.py          # подключение у LLM API
 │   │   ├── logging.py
 │   │   ├── ml_models
 │   │   │   ├── embeddings
 │   │   │   └── reranking
-│   │   └── ml_models.py      # подключение локальных моделей к LlamaIndex
+│   │   └── ml_models.py    # подключение локальных моделей к LlamaIndex
 │   ├── main.py
 │   ├── repositories
-│   │   └── qdrant.py         # работа с qdrant
+│   │   └── qdrant.py       # работа с qdrant
 │   ├── schemas
-│   │   ├── agent_state.py    # схема состояния агента для LangGraph
-│   │   └── query.py          # схема тела запросов к API
+│   │   ├── agent_state.py  # схема состояния агента для LangGraph
+│   │   └── query.py        # схема тела запросов к API
 │   ├── services
 │   │   ├── llm_nodes.py
 │   │   ├── processing_nodes.py
 │   │   ├── qdrant_nodes.py
 │   │   ├── route_nodes.py
-│   │   └── self_rag.py       # stateful граф SelfRAG агента на LangGraph
+│   │   └── self_rag.py     # stateful граф SelfRAG агента на LangGraph
 │   ├── tests
 │   │   ├── test_agent.py
 │   │   ├── test_connections.py
@@ -54,7 +55,6 @@
 │   │   └── test_retrieve.py
 │   └── utils
 │       └── validators.py
-├── polovoz.txt
 ├── README.md
 ├── requirements.txt
 └── scripts
@@ -64,8 +64,5 @@
     │   └── test_datasets
     │       └── polovoz_test.pdf
     ├── download_models.py
-    ├── ingestion_qdrant.py
-    └── tests
-        ├── test_ingestion.py
-        └── test_parsing.py
+    └── ingestion_qdrant.py
 ```

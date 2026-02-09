@@ -1,14 +1,14 @@
 from logging import Logger
 from pathlib import Path
 
-from llama_index.core import StorageContext, VectorStoreIndex
+from llama_index.core import VectorStoreIndex
 from llama_index.core.node_parser import HierarchicalNodeParser
 from llama_index.core.postprocessor import SentenceTransformerRerank
-from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.readers.file import PDFReader
 
 from app.core.config import Settings
+from app.core.database import Qdrant
 from app.utils.validators import ensure_path_exists
 
 
@@ -17,12 +17,12 @@ class QdrantIngestion:
         self,
         settings: Settings,
         logger: Logger,
-        ingestiers: list[StorageContext],
+        qdrant: Qdrant,
         emded_model: HuggingFaceEmbedding,
     ):
         self.settings = settings
         self.logger = logger
-        self.ingestiers = ingestiers
+        self.qdrant = qdrant
         self.embed_model = emded_model
 
     def load_pdf(self, file_path: Path | str):
@@ -59,12 +59,9 @@ class QdrantIngestion:
 
     def ingest_nodes_to_qdrant(self, file_path: Path | str, collection_name: str):
         try:
-            for i in range(len(self.settings.COLLECTIONS)):
-                if collection_name == self.settings.COLLECTIONS[i]:
-                    ingestier = self.ingestiers[i]
-                    break
-
             nodes = self.chunk_documents(file_path)
+
+            ingestier = self.qdrant.get_qdrant_ingestier(collection_name)
 
             self.logger.info(f"🔄 Начинаем запись в '{collection_name}' в qdrant...")
             VectorStoreIndex(
@@ -88,21 +85,17 @@ class QdrantRetrieve:
         self,
         settings: Settings,
         logger: Logger,
-        retrievers: list[VectorIndexRetriever],
+        qdrant: Qdrant,
         rerank_model: SentenceTransformerRerank,
     ):
         self.settings = settings
         self.logger = logger
-        self.retrievers = retrievers
+        self.qdrant = qdrant
         self.rerank_model = rerank_model
 
     def retrieve_nodes(self, query: str, collection_name: str):
         try:
-
-            for i in range(len(self.settings.COLLECTIONS)):
-                if collection_name == self.settings.COLLECTIONS[i]:
-                    retriever = self.retrievers[i]
-                    break
+            retriever = self.qdrant.get_qdrant_retriever(collection_name)
 
             self.logger.info(
                 f'🔄 Делаем retrieve запрос: "{query}" к "{collection_name}" в qdrant'
@@ -123,6 +116,7 @@ class QdrantRetrieve:
 
             nodes = self.retrieve_nodes(query, collection_name)
 
+            f'🔄 Делаем реранк: "{query}" к "{collection_name}" в qdrant'
             reranked_nodes = self.rerank_model.postprocess_nodes(
                 nodes=nodes,
                 query_str=query,
