@@ -1,15 +1,16 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.logging import logger
+from app.api.deps import get_logger, get_self_rag
 from app.schemas.agent_state import AgentState
 from app.schemas.query import QueryRequest
-from app.services.self_rag import graph
 
 query_router = APIRouter(prefix="/query", tags=["query"])
 
 
 @query_router.post("/ask")
-async def ask_question(request: QueryRequest):
+async def ask_question(
+    request: QueryRequest, self_rag=Depends(get_self_rag), logger=Depends(get_logger)
+):
     logger.info(f"🔄 Приняли запрос /query/ask от {request.id}")
     if not request.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty")
@@ -22,7 +23,7 @@ async def ask_question(request: QueryRequest):
     )
 
     try:
-        final_state = await graph.ainvoke(initial_state)
+        final_state = await self_rag.ainvoke(initial_state)
         logger.info(f"✅ Успешно обработали запрос /query/ask от {request.id}")
 
         return {"answer": final_state.get("answer")}
