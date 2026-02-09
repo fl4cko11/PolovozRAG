@@ -26,8 +26,10 @@ if __name__ == "__main__":
 
         print(f"🔄 Loading PDF: {pdf_path.name}")
 
-        ingestier = QdrantIngestion(settings, logger, qdrant, embed_model)
-        ingestier.ingest_file_to_qdrant(pdf_path, collection_name)
+        qdrant_ingestier = QdrantIngestion(
+            settings, logger, qdrant.get_qdrant_ingestiers(), embed_model
+        )
+        qdrant_ingestier.ingest_file_to_qdrant(pdf_path, collection_name)
 
         print(f"✅ Успешно ingested into Qdrant collection '{collection_name}'")
 
